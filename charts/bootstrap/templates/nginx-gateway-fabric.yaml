@@ -1,0 +1,48 @@
+{{- if .Values.nginxGatewayFabric.enabled }}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: nginx-gateway-fabric
+  namespace: {{ .Values.global.namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+    {{- with .Values.argocdApplication.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  labels:
+    {{- include "bootstrap.labels" . | nindent 4 }}
+    {{- with .Values.argocdApplication.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- if .Values.argocdApplication.finalizers }}
+  finalizers:
+    {{- range .Values.argocdApplication.finalizers }}
+    - {{ . }}
+    {{- end }}
+  {{- end }}
+spec:
+  destination:
+    namespace: {{ .Values.nginxGatewayFabric.namespace }}
+    server: {{ .Values.global.destination.server }}
+  project: {{ .Values.global.project }}
+  source:
+    path: .
+    repoURL: oci://ghcr.io/nginx/charts/nginx-gateway-fabric
+    targetRevision: {{ .Values.nginxGatewayFabric.targetRevision }}
+    helm:
+      valuesObject:
+{{- toYaml .Values.nginxGatewayFabric.values | nindent 8 }}
+  syncPolicy:
+    {{- if .Values.global.syncPolicy.automated }}
+    automated:
+      prune: {{ .Values.global.syncPolicy.automated.prune }}
+      selfHeal: {{ .Values.global.syncPolicy.automated.selfHeal }}
+    {{- end }}
+    {{- if .Values.global.syncPolicy.syncOptions }}
+    syncOptions:
+      {{- range .Values.global.syncPolicy.syncOptions }}
+      - {{ . }}
+      {{- end }}
+    {{- end }}
+{{- end }}

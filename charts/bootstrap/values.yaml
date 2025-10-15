@@ -1,0 +1,68 @@
+# Default values for bootstrap chart
+# This is a YAML-formatted file.
+
+# Global configuration
+global:
+  # Namespace where ArgoCD Applications will be created
+  namespace: argo-cd
+  # ArgoCD project name
+  project: default
+  # Destination server for all applications
+  destination:
+    server: https://kubernetes.default.svc
+  # Sync policy for applications
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - PrunePropagationPolicy=foreground
+      - PruneLast=true
+      - ServerSideApply=true
+
+# Gateway API configuration
+gatewayApi:
+  targetRevision: v1.4.0
+  path: config/crd
+
+# cert-manager configuration
+certManager:
+  enabled: true
+  namespace: cert-manager
+  targetRevision: v1.19.0
+  values:
+    crds:
+      enabled: true
+    config:
+      apiVersion: controller.config.cert-manager.io/v1alpha1
+      kind: ControllerConfiguration
+      enableGatewayAPI: true
+
+# NGINX Gateway Fabric configuration
+nginxGatewayFabric:
+  enabled: true
+  namespace: nginx-gateway-fabric
+  targetRevision: 2.1.4
+  values:
+    nginx:
+      service:
+        type: NodePort
+        nodePorts:
+          - port: 31437
+            listenerPort: 80
+          - port: 31438
+            listenerPort: 443
+      nodeSelector:
+        node-role.kubernetes.io/worker: ""
+
+
+# ArgoCD Application resource configuration
+argocdApplication:
+  # Finalizers for the Application resource
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+  # Additional labels
+  labels: {}
+  # Additional annotations
+  annotations: {}

@@ -1,0 +1,46 @@
+1. Get the application status by running these commands:
+   kubectl get applications -n {{ .Values.global.namespace }}
+
+2. Check individual application status:
+   kubectl describe application gateway-api -n {{ .Values.global.namespace }}
+{{- if .Values.certManager.enabled }}
+   kubectl describe application cert-manager -n {{ .Values.global.namespace }}
+{{- end }}
+{{- if .Values.nginxGatewayFabric.enabled }}
+   kubectl describe application nginx-gateway-fabric -n {{ .Values.global.namespace }}
+{{- end }}
+
+3. Check deployed resources:
+   kubectl get crd | grep gateway.networking.k8s.io
+{{- if .Values.certManager.enabled }}
+   kubectl get pods -n cert-manager
+   kubectl get crd | grep cert-manager
+{{- end }}
+{{- if .Values.nginxGatewayFabric.enabled }}
+   kubectl get pods -n {{ .Values.nginxGatewayFabric.namespace }}
+{{- end }}
+
+4. To view the ArgoCD UI, port-forward to the ArgoCD server:
+   kubectl port-forward svc/argocd-server -n {{ .Values.global.namespace }} 8080:443
+
+5. Access the ArgoCD UI at https://localhost:8080
+   Username: admin
+   Password: kubectl -n {{ .Values.global.namespace }} get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
+
+6. To sync applications manually:
+   argocd app sync gateway-api
+{{- if .Values.certManager.enabled }}
+   argocd app sync cert-manager
+{{- end }}
+{{- if .Values.nginxGatewayFabric.enabled }}
+   argocd app sync nginx-gateway-fabric
+{{- end }}
+
+7. Applications managed by this bootstrap chart:
+   - gateway-api (Gateway API CRDs)
+{{- if .Values.certManager.enabled }}
+   - cert-manager (cert-manager)
+{{- end }}
+{{- if .Values.nginxGatewayFabric.enabled }}
+   - nginx-gateway-fabric ({{ .Values.nginxGatewayFabric.namespace }})
+{{- end }}

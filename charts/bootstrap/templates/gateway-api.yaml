@@ -1,0 +1,42 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: gateway-api
+  namespace: {{ .Values.global.namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+    {{- with .Values.argocdApplication.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  labels:
+    {{- include "bootstrap.labels" . | nindent 4 }}
+    {{- with .Values.argocdApplication.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- if .Values.argocdApplication.finalizers }}
+  finalizers:
+    {{- range .Values.argocdApplication.finalizers }}
+    - {{ . }}
+    {{- end }}
+  {{- end }}
+spec:
+  destination:
+    server: {{ .Values.global.destination.server }}
+  project: {{ .Values.global.project }}
+  source:
+    path: {{ .Values.gatewayApi.path }}
+    repoURL: https://github.com/kubernetes-sigs/gateway-api
+    targetRevision: {{ .Values.gatewayApi.targetRevision }}
+  syncPolicy:
+    {{- if .Values.global.syncPolicy.automated }}
+    automated:
+      prune: {{ .Values.global.syncPolicy.automated.prune }}
+      selfHeal: {{ .Values.global.syncPolicy.automated.selfHeal }}
+    {{- end }}
+    {{- if .Values.global.syncPolicy.syncOptions }}
+    syncOptions:
+      {{- range .Values.global.syncPolicy.syncOptions }}
+      - {{ . }}
+      {{- end }}
+    {{- end }}

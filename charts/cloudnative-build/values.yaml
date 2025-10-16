@@ -32,12 +32,12 @@ argocd:
 tekton:
   enabled: true
   namespace: tekton-pipelines
-  targetRevision: tekton
+  targetRevision: main
 
 shipwright:
   enabled: true
   namespace: shipwright-build
-  targetRevision: shipwright
+  targetRevision: main
 
 harbor:
   enabled: true

@@ -61,7 +61,7 @@ centralGateway:
   enabled: true
   namespace: central-gateway
   repoURL: https://github.com/adambkaplan/quizap-deployments.git
-  targetRevision: helm-bootstrap
+  targetRevision: main
   values:
     ca:
       certManagerNamespace: cert-manager

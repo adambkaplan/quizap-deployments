@@ -1,0 +1,17 @@
+apiVersion: v2
+name: cloudnative-build
+description: A Helm chart for deploying CloudNative Build tools using ArgoCD Applications
+type: application
+version: 0.1.0
+appVersion: "1.0"
+keywords:
+  - argocd
+  - app-of-apps
+  - tekton
+  - ci-cd
+home: https://github.com/adambkaplan/quizap-deployments
+sources:
+  - https://github.com/adambkaplan/quizap-deployments
+maintainers:
+  - name: Adam Kaplan
+    email: adam@adambkaplan.com

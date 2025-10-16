@@ -1,0 +1,7 @@
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: shipwright-build
+  namespace: system
+spec:
+  selfSigned: {}

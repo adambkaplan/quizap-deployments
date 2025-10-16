@@ -1,0 +1,52 @@
+{{- if .Values.shipwright.enabled }}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: shipwright
+  namespace: {{ .Values.argocd.namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+    {{- with .Values.argocd.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  labels:
+    {{- include "cloudnative-build.labels" . | nindent 4 }}
+    {{- with .Values.argocd.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- if .Values.argocd.finalizers }}
+  finalizers:
+    {{- range .Values.argocd.finalizers }}
+    - {{ . }}
+    {{- end }}
+  {{- end }}
+spec:
+  destination:
+    namespace: {{ .Values.shipwright.namespace }}
+    server: {{ .Values.argocd.destination.server }}
+  project: {{ .Values.argocd.project }}
+  source:
+    path: kustomize/shipwright
+    repoURL: https://github.com/adambkaplan/quizap-deployments
+    targetRevision: {{ .Values.shipwright.targetRevision }}
+  ignoreDifferences:
+    # Shipwright's CRD manifest includes the preserveUnknownFields field, which is deprecated.
+    # See https://argo-cd.readthedocs.io/en/stable/operator-manual/upgrading/2.14-3.0/#removing-default-ignores-of-preserveunknownfields-for-crd
+    - group: apiextensions.k8s.io
+      kind: CustomResourceDefinition
+      jsonPointers:
+        - /spec/preserveUnknownFields
+  syncPolicy:
+    {{- if .Values.argocd.syncPolicy.automated }}
+    automated:
+      prune: {{ .Values.argocd.syncPolicy.automated.prune }}
+      selfHeal: {{ .Values.argocd.syncPolicy.automated.selfHeal }}
+    {{- end }}
+    {{- if .Values.argocd.syncPolicy.syncOptions }}
+    syncOptions:
+      {{- range .Values.argocd.syncPolicy.syncOptions }}
+      - {{ . }}
+      {{- end }}
+    {{- end }}
+{{- end }}

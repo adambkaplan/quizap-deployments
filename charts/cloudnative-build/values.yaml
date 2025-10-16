@@ -38,3 +38,16 @@ shipwright:
   enabled: true
   namespace: shipwright-build
   targetRevision: shipwright
+
+harbor:
+  enabled: true
+  namespace: harbor
+  targetRevision: v1.18.0
+  tls:
+    enabled: true
+    secretName: harbor-tls
+  gateway:
+    name: central-gateway
+    namespace: central-gateway
+    sectionName: https-wildcard
+  hostname: registry.k8s.local

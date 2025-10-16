@@ -1,6 +1,8 @@
 # CloudNative Build
 
-A Helm chart for deploying CloudNative Build tools using ArgoCD Applications. This chart creates ArgoCD Application resources that manage the deployment of Tekton Pipelines and other CI/CD tools in your Kubernetes cluster.
+A Helm chart for deploying CloudNative Build tools using ArgoCD Applications.
+This chart creates ArgoCD Application resources that manage the deployment of
+Tekton, Shipwright, and Harbor for QuizApp developers.
 
 ## Prerequisites
 
@@ -30,15 +32,16 @@ helm install argocd argo/argo-cd \
 # Install the cloudnative-build chart
 helm install cloudnative-build . \
   --namespace argo-cd \
-  --set argocd.namespace=argo-cd \
-  --set tekton.enabled=true
+  --create-namespace
 ```
 
 ## What This Chart Creates
 
 This chart deploys ArgoCD Application resources that manage CloudNative Build tools:
 
-1. **Tekton Application** (`tekton`): An ArgoCD Application that deploys Tekton Pipelines to the `tekton-pipelines` namespace
+1. `tekton`: Deploys Tekton Pipelines to the `tekton-pipelines` namespace
+2. `shipwright`: Deploys Shipwright Build to the `shipwright-build` namespace
+3. `harbor`: Deploys the Harbor container registry to the `harbor` namespace
 
 ## Configuration
 
@@ -55,6 +58,15 @@ The following table lists the configurable parameters and their default values:
 | `argocd.finalizers` | Finalizers for the Application resource | `["resources-finalizer.argocd.argoproj.io"]` |
 | `argocd.labels` | Additional labels to apply to applications | `{}` |
 | `argocd.annotations` | Additional annotations to apply to applications | `{}` |
+| `harbor.enabled` | Enables Harbor deployment | `true` |
+| `harbor.namespace` | Namespace where Harbor is deployed | `harbor` |
+| `harbor.targetRevision` | Version of the Harbor chart to deploy | `v1.18.0` |
+| `harbor.tls.enabled` | Enable backend TLS for Harbor | `true` |
+| `harbor.tls.secretName` | Reference to TLS secret for Harbor backend service | `harbor-tls` |
+| `harbor.gateway.name` | Name of the gateway for Harbor ingress | `central-gateway` |
+| `harbor.gateway.namespace` | Namespace of the gateway for Harbor ingress | `central-gateway` |
+| `harbor.gateway.sectionName` | Section of the gateway for Harbor ingress | `https-wildcard` |
+| `harbor.hostname` | Hostname for Harbor | `registry.k8s.local` |
 | `tekton.enabled` | Enable Tekton Pipelines deployment | `true` |
 | `tekton.namespace` | Namespace where Tekton will be deployed | `tekton-pipelines` |
 | `tekton.targetRevision` | Git revision/branch for Tekton deployment | `tekton` |
@@ -120,6 +132,12 @@ kubectl describe application tekton -n argo-cd
 
 # Check if Tekton is deployed
 kubectl get pods -n tekton-pipelines
+
+# Check if Shipwright is deployed
+kubectl get pods -n shipwright-build
+
+# Check if Harbor is deployed
+kubectl get pods -n harbor
 ```
 
 ## Troubleshooting

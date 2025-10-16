@@ -21,6 +21,15 @@ for managing CloudNative Build tools in your Kubernetes cluster.
    - Target Revision: {{ .Values.shipwright.targetRevision }}
 {{- end }}
 
+{{- if .Values.harbor.enabled }}
+✅ Harbor Deployed!
+   - Application Name: harbor
+   - Namespace: {{ .Values.harbor.namespace }}
+   - Chart Repository: https://helm.goharbor.io
+   - Chart: harbor
+   - Target Revision: {{ .Values.harbor.targetRevision }}
+{{- end }}
+
 ## What's Next?
 
 1. **Monitor Application Status**:
@@ -31,6 +40,7 @@ for managing CloudNative Build tools in your Kubernetes cluster.
    # Check specific application
    kubectl describe application tekton -n {{ .Values.argocd.namespace }}
    kubectl describe application shipwright -n {{ .Values.argocd.namespace }}
+   kubectl describe application harbor -n {{ .Values.argocd.namespace }}
    ```
 
 2. **Verify Deployments**:
@@ -63,4 +73,10 @@ for managing CloudNative Build tools in your Kubernetes cluster.
 - Shipwright:
   - Namespace: {{ .Values.shipwright.namespace }}
   - Target Revision: {{ .Values.shipwright.targetRevision }}
+{{- end }}
+{{- if .Values.harbor.enabled }}
+- Harbor:
+  - Namespace: {{ .Values.harbor.namespace }}
+  - Target Revision: {{ .Values.harbor.targetRevision }}
+  - Hostname: {{ .Values.harbor.hostname}}
 {{- end }}

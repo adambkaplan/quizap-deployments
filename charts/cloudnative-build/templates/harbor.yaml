@@ -1,0 +1,87 @@
+{{- if .Values.harbor.enabled }}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: harbor
+  namespace: {{ .Values.argocd.namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+    {{- with .Values.argocd.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  labels:
+    {{- include "cloudnative-build.labels" . | nindent 4 }}
+    {{- with .Values.argocd.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- if .Values.argocd.finalizers }}
+  finalizers:
+    {{- range .Values.argocd.finalizers }}
+    - {{ . }}
+    {{- end }}
+  {{- end }}
+spec:
+  destination:
+    namespace: {{ .Values.harbor.namespace }}
+    server: {{ .Values.argocd.destination.server }}
+  project: {{ .Values.argocd.project }}
+  ignoreDifferences:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      jsonPointers:
+        - /spec/parentRefs/0/group
+        - /spec/rules/0/backendRefs/0/group
+        - /spec/rules/0/backendRefs/0/kind
+        - /spec/rules/0/backendRefs/0/weight
+        - /spec/rules/0/backendRefs/1/group
+        - /spec/rules/0/backendRefs/1/kind
+        - /spec/rules/0/backendRefs/1/weight
+        - /spec/rules/1/backendRefs/0/group
+        - /spec/rules/1/backendRefs/0/kind
+        - /spec/rules/1/backendRefs/0/weight
+    - group: apps
+      kind: StatefulSet
+      # Known issue with StatefulSet reconcile of VolumeClaimTemplates
+      # See https://github.com/argoproj/argo-cd/issues/16707
+      jsonPointers:
+        - /spec/volumeClaimTemplates
+  source:
+    repoURL: https://helm.goharbor.io
+    chart: harbor
+    targetRevision: {{ .Values.harbor.targetRevision }}
+    helm:
+      valuesObject:
+        expose:
+          type: route
+          tls:
+            enabled: {{ .Values.harbor.tls.enabled }}
+            certSource: secret
+            secret:
+              secretName: {{ .Values.harbor.tls.secretName }}
+          route:
+            parentRefs:
+              - name: {{ .Values.harbor.gateway.name}}
+                namespace: {{ .Values.harbor.gateway.namespace }}
+                kind: Gateway
+                sectionName: {{ .Values.harbor.gateway.sectionName }}
+            hosts:
+              - {{ .Values.harbor.hostname }}
+        externalURL: https://{{ .Values.harbor.hostname }}
+        persistence:
+          enabled: true
+          imageChartStorage:
+            disableRedirect: true
+  syncPolicy:
+    {{- if .Values.argocd.syncPolicy.automated }}
+    automated:
+      prune: {{ .Values.argocd.syncPolicy.automated.prune }}
+      selfHeal: {{ .Values.argocd.syncPolicy.automated.selfHeal }}
+    {{- end }}
+    {{- if .Values.argocd.syncPolicy.syncOptions }}
+    syncOptions:
+      {{- range .Values.argocd.syncPolicy.syncOptions }}
+      - {{ . }}
+      {{- end }}
+    {{- end }}
+{{- end }}

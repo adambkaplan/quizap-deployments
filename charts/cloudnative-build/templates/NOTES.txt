@@ -5,12 +5,20 @@ CloudNative Build Installation Complete!
 This Helm chart has successfully deployed ArgoCD Application resources
 for managing CloudNative Build tools in your Kubernetes cluster.
 
-{{- if .Values.tekton.enabled }}
+{{- if or .Values.tekton.enabled .Values.shipwright.enabled }}
 ✅ Tekton Pipelines Application Created
    - Application Name: tekton
    - Namespace: {{ .Values.tekton.namespace }}
    - Source Repository: https://github.com/adambkaplan/quizap-deployments
    - Target Revision: {{ .Values.tekton.targetRevision }}
+{{- end }}
+
+{{- if .Values.shipwright.enabled }}
+✅ Shipwright Application Created
+   - Application Name: shipwright
+   - Namespace: {{ .Values.shipwright.namespace }}
+   - Source Repository: https://github.com/adambkaplan/quizap-deployments
+   - Target Revision: {{ .Values.shipwright.targetRevision }}
 {{- end }}
 
 ## What's Next?
@@ -22,22 +30,37 @@ for managing CloudNative Build tools in your Kubernetes cluster.
    
    # Check specific application
    kubectl describe application tekton -n {{ .Values.argocd.namespace }}
+   kubectl describe application shipwright -n {{ .Values.argocd.namespace }}
    ```
 
 2. **Verify Deployments**:
-   {{- if .Values.tekton.enabled }}
+   {{- if or .Values.tekton.enabled .Values.shipwright.enabled }}
    ```bash
    # Check Tekton deployment
    kubectl get pods -n {{ .Values.tekton.namespace }}
    ```
    {{- end }}
 
+   {{- if .Values.shipwright.enabled }}
+   ```bash
+   # Check Shipwright deployment
+   kubectl get pods -n {{ .Values.shipwright.namespace }}
+   ```
+   {{- end}}
+
 ## Configuration Summary
 
-- ArgoCD Namespace: {{ .Values.argocd.namespace }}
-- ArgoCD Project: {{ .Values.argocd.project }}
-- Sync Policy: {{ if .Values.argocd.syncPolicy.automated.prune }}Prune{{ else }}No Prune{{ end }}, {{ if .Values.argocd.syncPolicy.automated.selfHeal }}Self-Heal{{ else }}No Self-Heal{{ end }}
-{{- if .Values.tekton.enabled }}
-- Tekton Namespace: {{ .Values.tekton.namespace }}
-- Tekton Target Revision: {{ .Values.tekton.targetRevision }}
+- ArgoCD:
+  - Namespace: {{ .Values.argocd.namespace }}
+  - Project: {{ .Values.argocd.project }}
+  - Sync Policy: {{ if .Values.argocd.syncPolicy.automated.prune }}Prune{{ else }}No Prune{{ end }}, {{ if .Values.argocd.syncPolicy.automated.selfHeal }}Self-Heal{{ else }}No Self-Heal{{ end }}
+{{- if or .Values.tekton.enabled .Values.shipwright.enabled }}
+- Tekton:
+  - Namespace: {{ .Values.tekton.namespace }}
+  - Target Revision: {{ .Values.tekton.targetRevision }}
+{{- end }}
+{{- if .Values.shipwright.enbled }}
+- Shipwright:
+  - Namespace: {{ .Values.shipwright.namespace }}
+  - Target Revision: {{ .Values.shipwright.targetRevision }}
 {{- end }}

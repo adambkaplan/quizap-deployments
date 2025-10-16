@@ -33,3 +33,8 @@ tekton:
   enabled: true
   namespace: tekton-pipelines
   targetRevision: tekton
+
+shipwright:
+  enabled: true
+  namespace: shipwright-build
+  targetRevision: shipwright

@@ -58,6 +58,9 @@ The following table lists the configurable parameters and their default values:
 | `tekton.enabled` | Enable Tekton Pipelines deployment | `true` |
 | `tekton.namespace` | Namespace where Tekton will be deployed | `tekton-pipelines` |
 | `tekton.targetRevision` | Git revision/branch for Tekton deployment | `tekton` |
+| `shipwright.enabled` | Enable Shipwright Build deployment | `true` |
+| `shipwright.namespace` | Namespace where Shipwright will be deployed | `shipwright-build` |
+| `shipwright.targetRevision` | Git revision/branch for Shipwright deployment | `shipwright` |
 
 ## Usage
 

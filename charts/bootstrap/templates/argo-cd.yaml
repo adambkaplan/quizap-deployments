@@ -1,0 +1,56 @@
+{{- if .Values.argoCD.enabled }}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: argo-cd
+  namespace: {{ .Values.global.namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "4"
+    {{- with .Values.argocdApplication.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  labels:
+    {{- include "bootstrap.labels" . | nindent 4 }}
+    {{- with .Values.argocdApplication.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- if .Values.argocdApplication.finalizers }}
+  finalizers:
+    {{- range .Values.argocdApplication.finalizers }}
+    - {{ . }}
+    {{- end }}
+  {{- end }}
+spec:
+  destination:
+    namespace: {{ .Values.argoCD.namespace }}
+    server: {{ .Values.global.destination.server }}
+  # Ignore backendRefs group and kind differences
+  # See https://github.com/argoproj/argo-helm/issues/3538
+  ignoreDifferences:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      jsonPointers:
+        - /spec/rules/0/backendRefs/0/group
+        - /spec/rules/0/backendRefs/0/kind
+  project: {{ .Values.global.project }}
+  source:
+    path: .
+    repoURL: oci://ghcr.io/argoproj/argo-helm/argo-cd
+    targetRevision: {{ .Values.argoCD.targetRevision }}
+    helm:
+      valuesObject:
+{{- toYaml .Values.argoCD.values | nindent 8 }}
+  syncPolicy:
+    {{- if .Values.global.syncPolicy.automated }}
+    automated:
+      prune: {{ .Values.global.syncPolicy.automated.prune }}
+      selfHeal: {{ .Values.global.syncPolicy.automated.selfHeal }}
+    {{- end }}
+    {{- if .Values.global.syncPolicy.syncOptions }}
+    syncOptions:
+      {{- range .Values.global.syncPolicy.syncOptions }}
+      - {{ . }}
+      {{- end }}
+    {{- end }}
+{{- end }}

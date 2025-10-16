@@ -1,0 +1,44 @@
+# Copyright Adam B Kaplan
+#
+# SPDX-License-Identifier: MIT
+
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: {{ .Values.gateway.name }}
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    cert-manager.io/cluster-issuer: {{ .Values.caIssuer.name }}
+  labels:
+    app.kubernetes.io/component: gateway
+    {{- include "central-gateway.labels" . | nindent 4 }}
+  {{- with (include "central-gateway.annotations" .) }}
+  annotations:
+    {{- . | nindent 4 }}
+  {{- end }}
+spec:
+  gatewayClassName: {{ .Values.gateway.gatewayClassName }}
+  listeners:
+  # Wildcard HTTP listener for all subdomains
+  - name: http-wildcard
+    port: 80
+    protocol: HTTP
+    hostname: "*.{{ .Values.gateway.hostname }}"
+    allowedRoutes:
+      namespaces:
+        from: All
+  # Wildcard HTTPS listener for all subdomains
+  - name: https-wildcard
+    port: 443
+    protocol: HTTPS
+    hostname: "*.{{ .Values.gateway.hostname }}"
+    tls:
+      mode: Terminate
+      certificateRefs:
+        - group: ""
+          kind: Secret
+          name: {{ .Values.gateway.name }}-wildcard-tls
+    allowedRoutes:
+      namespaces:
+        from: All

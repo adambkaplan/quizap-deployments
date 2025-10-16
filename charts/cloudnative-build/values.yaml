@@ -1,0 +1,35 @@
+# Default values for bootstrap chart
+# This is a YAML-formatted file.
+
+# ArgoCD configuration
+argocd:
+  # Namespace where ArgoCD Applications will be created
+  namespace: argo-cd
+  # ArgoCD project name
+  project: default
+  # Destination server for all applications
+  destination:
+    server: https://kubernetes.default.svc
+  # Sync policy for applications
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - PrunePropagationPolicy=foreground
+      - PruneLast=true
+      - ServerSideApply=true
+  # Finalizers for the Application resource
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+  # Additional labels
+  labels: {}
+  # Additional annotations
+  annotations: {}
+
+# Tekton configuration
+tekton:
+  enabled: true
+  namespace: tekton-pipelines
+  targetRevision: tekton

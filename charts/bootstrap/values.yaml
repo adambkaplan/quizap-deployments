@@ -56,6 +56,18 @@ nginxGatewayFabric:
       nodeSelector:
         node-role.kubernetes.io/worker: ""
 
+# Central Gateway configuration
+centralGateway:
+  enabled: true
+  namespace: central-gateway
+  repoURL: https://github.com/adambkaplan/quizap-deployments.git
+  targetRevision: helm-bootstrap
+  values:
+    ca:
+      certManagerNamespace: cert-manager
+    gateway:
+      hostname: k8s.local
+      gatewayClassName: nginx
 
 # ArgoCD Application resource configuration
 argocdApplication:

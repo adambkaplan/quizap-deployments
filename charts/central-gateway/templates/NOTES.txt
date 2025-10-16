@@ -1,0 +1,71 @@
+===============================================
+Central Gateway Installation Complete!
+
+This Helm chart has successfully deployed a gateway for the
+{{ .Values.gateway.hostname }} domain, with dedicated PKI infrastructure
+provided by cert-manager.
+
+1. Root Issuer ({{ .Values.rootIssuer.name }}): A self-signed root
+   certificate authority.
+2. CA Certificate ({{ .Values.ca.name }}): An intermediate CA certificate
+   signed by the root
+3. CA Issuer ({{ .Values.caIssuer.name }}): A ClusterIssuer that can issue
+   certificates using the CA.
+4. Gateway ({{ .Values.gateway.name }}): A Gateway API that listens for HTTP
+   and HTTPS traffic for the {{ .Values.gateway.hostname }} domain and all
+   sub-domains.
+
+You can now use the '{{ .Values.caIssuer.name }}' ClusterIssuer to issue
+certificates for your applications.
+
+Example usage:
+  apiVersion: cert-manager.io/v1
+  kind: Certificate
+  metadata:
+    name: my-app-cert
+    namespace: my-namespace
+  spec:
+    secretName: my-app-tls
+    issuerRef:
+      name: {{ .Values.caIssuer.name }}
+      kind: ClusterIssuer
+    dnsNames:
+    - my-app.example.com
+
+You can also use Gateway API resources, such as HTTPRoutes, to route traffic to
+your application using a subdomain. The {{ .Values.gateway.name }} Gateway
+provides the following listeners:
+
+- http-wildcard: listens to HTTP traffic for "*.{{ .Values.gateway.hostname }}"
+  subdomains.
+- https-wildcard: listens to HTTPS traffic for "*.{{ .Values.gateway.hostname }}"
+  subdomains.
+
+Example usage:
+
+  apiVersion: gateway.networking.k8s.io/v1
+  kind: HTTPRoute
+  metadata:
+    name: my-app
+  spec:
+    parentRefs:
+    - name: {{ .Values.gateway.name }}
+      namespace: {{ .Release.Namespace }}
+      sectionName: https-wildcard
+    hostnames:
+    - app.{{ .Values.gateway.hostname }}
+    rules:
+    - matches:
+      - path:
+          type: PathPrefix
+          value: /api
+      backendRefs:
+      - name: api-service
+        port: 8080
+    - matches:
+      - path:
+        type: PathPrefix
+        value: /
+      backendRefs:
+      - name: frontend-service
+        port: 8080

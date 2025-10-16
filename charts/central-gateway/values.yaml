@@ -1,0 +1,31 @@
+# Default values for k8s-local-ca.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# CA Certificate configuration
+ca:
+  name: central-gateway-ca
+  commonName: ca.central-gateway
+  certManagerNamespace: cert-manager
+  secretName: central-gateway-ca
+  privateKey:
+    algorithm: ECDSA
+    size: 256
+
+# Root Issuer configuration
+rootIssuer:
+  name: central-gateway-root
+
+# CA Issuer configuration
+caIssuer:
+  name: central-gateway-ca
+
+# Global labels and annotations to apply to all resources
+global:
+  labels: {}
+  annotations: {}
+
+gateway:
+  name: central-gateway
+  gatewayClassName: nginx
+  hostname: k8s.local

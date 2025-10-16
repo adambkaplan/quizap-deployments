@@ -1,0 +1,20 @@
+apiVersion: v2
+name: central-gateway
+description: A Helm chart for central gateway with PKI and TLS termination
+type: application
+version: 0.1.0
+appVersion: "1.0"
+keywords:
+  - gateway
+  - cert-manager
+  - pki
+  - ca
+  - certificates
+  - tls
+home: https://github.com/adambkaplan/quizap
+sources:
+  - https://github.com/adambkaplan/quizap
+maintainers:
+  - name: Adam B Kaplan
+    email: adam@example.com
+dependencies: []

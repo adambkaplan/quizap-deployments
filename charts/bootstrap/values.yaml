@@ -66,8 +66,32 @@ centralGateway:
     ca:
       certManagerNamespace: cert-manager
     gateway:
+      name: central-gateway
       hostname: k8s.local
       gatewayClassName: nginx
+
+argoCD:
+  enabled: true
+  namespace: argo-cd
+  targetRevision: 8.6.3
+  values:
+    global:
+      domain: argo-cd.k8s.local
+    configs:
+      params:
+        server.insecure: true
+    server:
+      httproute:
+        enabled: true
+        hostnames:
+        - argo-cd.k8s.local
+        parentRefs:
+        - group: gateway.networking.k8s.io
+          kind: Gateway
+          name: central-gateway
+          namespace: central-gateway
+          sectionName: https-wildcard
+
 
 # ArgoCD Application resource configuration
 argocdApplication:

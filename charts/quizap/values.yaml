@@ -7,7 +7,7 @@ frontend:
   name: quizap-frontend
   image:
     repository: harbor-core.harbor.svc.cluster.local/quizap/frontend
-    tag: latest
+    tag: demo-1
     pullPolicy: IfNotPresent
   replicas: 1
   port: 8080

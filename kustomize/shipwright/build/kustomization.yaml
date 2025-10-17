@@ -194,6 +194,6 @@ replacements:
           index: 1
 
 metadata:
-  name: shipwright
+  name: shipwright-build
   annotations:
     description: "Shipwright installation from latest release"

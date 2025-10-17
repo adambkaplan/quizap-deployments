@@ -6,7 +6,7 @@
 frontend:
   name: quizap-frontend
   image:
-    repository: harbor-core.harbor.svc.cluster.local/quizap/frontend
+    repository: registry.k8s.local/quizap/frontend
     tag: demo-1
     pullPolicy: IfNotPresent
   replicas: 1
@@ -26,7 +26,7 @@ frontend:
 backend:
   name: quizap-backend
   image:
-    repository: harbor-core.harbor.svc.cluster.local/quizap/backend
+    repository: registry.k8s.local/quizap/backend
     tag: latest
     pullPolicy: IfNotPresent
   replicas: 1

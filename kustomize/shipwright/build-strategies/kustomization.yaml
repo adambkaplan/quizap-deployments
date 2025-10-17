@@ -5,12 +5,11 @@ namespace: shipwright-build
 
 resources:
   - https://github.com/shipwright-io/build/releases/download/v0.17.0/sample-strategies.yaml
-
-# Patch to address low resources with the ko strategy
-# See https://github.com/shipwright-io/build/issues/2011
-patches:
-  - path: patches/ko-build-resources.yaml
-
+  # Provide "XL" version of ko strategy, with more CPU and memory
+  # See https://github.com/shipwright-io/build/issues/2011
+  - ko-xl.yaml
+  # Provide "XL" version of buildpacks-v3 strategy, with more CPU and memory
+  - buildpacks-v3-xl.yaml
 metadata:
   name: shipwright-build-strategies
   annotations:

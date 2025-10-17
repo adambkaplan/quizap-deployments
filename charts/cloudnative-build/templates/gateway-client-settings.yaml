@@ -3,6 +3,8 @@
 apiVersion: gateway.nginx.org/v1alpha1
 kind: ClientSettingsPolicy
 metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
   name: harbor-route
   namespace: {{ .Values.harbor.namespace }}
 spec:

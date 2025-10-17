@@ -6,7 +6,7 @@ metadata:
   name: harbor
   namespace: {{ .Values.argocd.namespace }}
   annotations:
-    argocd.argoproj.io/sync-wave: "3"
+    argocd.argoproj.io/sync-wave: "1"
     {{- with .Values.argocd.annotations }}
     {{- toYaml . | nindent 4 }}
     {{- end }}

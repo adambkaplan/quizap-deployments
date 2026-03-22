@@ -4,7 +4,7 @@ kind: Kustomization
 namespace: shipwright-build
 
 resources:
-  - https://github.com/shipwright-io/build/releases/download/v0.17.0/release.yaml
+  - https://github.com/shipwright-io/build/releases/download/v0.19.1/release.yaml
   - cert-manager
 
 patches:
@@ -196,4 +196,4 @@ replacements:
 metadata:
   name: shipwright-build
   annotations:
-    description: "Shipwright installation from latest release"
+    description: "Shipwright Build installation from latest release"

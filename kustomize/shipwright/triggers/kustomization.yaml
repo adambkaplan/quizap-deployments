@@ -1,0 +1,12 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: shipwright-build
+
+resources:
+  - https://github.com/shipwright-io/triggers/releases/download/v0.19.0/release.yaml
+
+metadata:
+  name: shipwright-triggers
+  annotations:
+    description: "Shipwright Triggers installation from latest release"
